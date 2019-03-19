@@ -10,7 +10,7 @@ class client():
         self.thread = threading.Thread(target=self.work, args=())
         self.thread.deamon = True
         self.dowork = True
-
+        self.thread.start()
     def send(self, data):
         self.socket.send(data)
 
@@ -20,7 +20,8 @@ class client():
                 data = self.socket.recv(2048)
                 if data:
                     self.onrecieve(self, data)
-        except Exception :
+        except Exception as e :
+            print(e)
             self.server.close_client(self)
            
 
@@ -37,6 +38,7 @@ class server(socket.socket):
             self.listen(5)
             t = threading.Thread(target=self.work, args=())
             t.deamon = True
+            t.start()
         except Exception as e :
             print(e)
 
@@ -50,15 +52,19 @@ class server(socket.socket):
             while self.should_work:
                 clientSocket = self.accept()[0]
                 self.acceptClient(clientSocket)
-            self.close()
+            print('Closing')
         except Exception as e:
-            print(e)
+            raise
+        finally:
+             self.close()
     
     def close_client(self, client):
         self.clients.remove(self)
         client.dowork = False
         client.socket.close()
 
-    def close(self):
+    def shut_server(self):
         self.should_work = False
-        socket.socket.close(self)
+        self.shutdown(socket.SHUT_RDWR)
+
+        
