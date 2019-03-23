@@ -1,5 +1,5 @@
 routes = [
-    ('AUTH','auth')
+    ('/AUTH','auth')
 ]
 
 

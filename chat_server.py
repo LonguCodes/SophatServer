@@ -11,25 +11,23 @@ def parse_request(data):
     }
 
 def handle_data(sender,data):
-    request = parse_request(data)
+    request = parse_request(str(data))
     router.route(request)
 
 
-
-def onreceivedata(sender, data):
-    handle_data(sender,data)
+def on_accept(client):
+    print('Accepted client : ', client.address)
+    client.begin_receive(handle_data)
     pass
 
-def onaccept(client):
-    pass
-
-
-s = server(('', 5080), onaccept, onreceivedata)
-
+print('Starting server')
+s = server(('0.0.0.0', 5050), on_accept)
+s.debug = True
+print('Server started')
 try:
-    while s.should_work:
+    while s.work:
         pass
 except KeyboardInterrupt:
-    s.shut_server()
-    print('\n')
+    print('Stopping server')
+    s.work = False
 

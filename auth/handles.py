@@ -1,2 +1,2 @@
-def test(request):
+def auth(request):
     print(request)

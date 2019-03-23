@@ -5,6 +5,6 @@ routes = [
 
 
 handles = [
-    ('auth','test')
+    ('/auth','auth')
 ]
 
