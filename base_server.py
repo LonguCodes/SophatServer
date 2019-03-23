@@ -18,7 +18,7 @@ class client():
             target=self.threader, daemon=True, args=())
         self.thread.start()
         
-    def begin_receive(self, callback):
+    def begin_receive(self, callback ):
         print('Starting to receive')
         self.try_receive = True
         self.tasks.put((self.task_receive, (callback,)))
@@ -26,7 +26,7 @@ class client():
     def end_receive(self):
         self.try_receive = False
 
-    def begin_send(self, data, callback):
+    def begin_send(self, data, callback= None):
         self.tasks.put((self.task_send, (data, callback)))
 
     def task_receive(self, callback):

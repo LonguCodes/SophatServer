@@ -1,18 +1,14 @@
 from base_server import server
 import router
+import json
 
-def parse_request(data):
-    header, body = data.split(':!:')
-    headers = dict([tuple(h.split(':|:')) for h in header.split(':-:')])
-    
-    return {
-        'headers': headers,
-        'body' : body
-    }
 
 def handle_data(sender,data):
-    request = parse_request(str(data))
-    router.route(request)
+    request = json.loads(str(data,encoding='UTF-8'))
+    response = router.route_request(request)
+    print(json.dumps(response)) 
+    sender.begin_send(json.dumps(response).encode())    
+    
 
 
 def on_accept(client):
