@@ -1,3 +1,5 @@
+import tokens
+
 def auth(request):
     # TODO : make database lookup to check if user with credentials exist
     # If so send him a token
@@ -7,7 +9,7 @@ def auth(request):
             'RESPONSE':'1'
         },
         'body':{
-            'TOKEN':'123123'
+            'TOKEN': tokens.generate()
         }
     }
     
