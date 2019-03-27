@@ -1,5 +1,6 @@
 routes = [
-    ('/AUTH','auth')
+    ('/AUTH','auth'),
+    ('/MESSAGE','message')
 ]
 
 

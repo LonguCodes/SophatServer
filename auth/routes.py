@@ -5,6 +5,7 @@ routes = [
 
 
 handles = [
-    ('/auth','auth')
+    ('/auth','login'),
+    ('/token','renew_token')
 ]
 

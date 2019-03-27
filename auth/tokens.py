@@ -1,8 +1,13 @@
 from time import time
 from Crypto.Cipher import AES
 from Crypto import Random
+from protocol import response
+
 import base64
 import hashlib
+
+
+
 
 EXPIRY_TIME = 600
 
@@ -47,21 +52,12 @@ def decrypt(to_decrypt, key):
 
 
 def require_token(function):
-    def wrapper(*args, **kwargs):
-        request = args[0]
+    def wrapper(request, *args, **kwargs):
         if 'ID' not in request['headers'] or 'TOKEN' not in request['headers']:
-            return {
-                'headers':{
-                    'response' : 2,
-                }
-            }
+            return response.unknown_request()
         id = request['headers']['ID']
         token = request['headers']['TOKEN']
         if not check(id,token):
-            return {
-                'headers':{
-                    'response' : 2,
-                }
-            }
-        return function(*args, **kwargs)
-    return function
+            return response.wrong_authentication()
+        return function(request, *args, **kwargs)
+    return wrapper
