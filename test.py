@@ -1,6 +1,7 @@
 from message import data
 
 
+
 chat = [
     {
         'id':0,
@@ -10,5 +11,6 @@ chat = [
 
     }
 ]
+# data.save_chat(0,chat)
 for message in data.load_chat(0):
-    print(message)
+   print(message)
