@@ -1,9 +1,10 @@
 from auth import tokens
-from protocol import response
+from protocol import response,requires
 
+@requires.require_body('LOGIN')
+@requires.require_body('PASSWORD')
 def login(request):
-    if 'LOGIN' not in request['body'] or 'PASSWORD' not in request['body']:
-        return response.unknown_request()
+    
 
     login  = request['body']['LOGIN']
     password = request['body']['PASSWORD']

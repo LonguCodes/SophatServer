@@ -25,6 +25,8 @@ def check(id, token):
     encryption_key = hashlib.sha256(key.encode()).digest()
     decrypted = decrypt(token, encryption_key)
     token_id, expire_time = decrypted.split(':')
+    token_id = int(token_id)
+    expire_time = float(expire_time)
     return token_id == id and expire_time > time()
 
 
@@ -41,7 +43,7 @@ def encrypt(to_encrypt, key):
     raw = pad(to_encrypt, 32)
     iv = Random.new().read(AES.block_size)
     cipher = AES.new(key, AES.MODE_CBC, iv)
-    return base64.b64encode(iv + cipher.encrypt(raw))
+    return base64.b64encode(iv + cipher.encrypt(raw)).decode('utf-8')
 
 
 def decrypt(to_decrypt, key):

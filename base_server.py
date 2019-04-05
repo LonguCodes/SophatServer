@@ -1,5 +1,6 @@
 import socket
 import threading
+import traceback
 from queue import Queue
 
 BUFFER_SIZE = 2048
@@ -18,18 +19,17 @@ class client():
             target=self.threader, daemon=True, args=())
         self.thread.start()
         
-    def begin_receive(self, callback ):
-        print('Starting to receive')
+    def begin_receive(self):
         self.try_receive = True
-        self.tasks.put((self.task_receive, (callback,)))
+        self.tasks.put((self.task_receive, ()))
 
     def end_receive(self):
         self.try_receive = False
 
-    def begin_send(self, data, callback= None):
-        self.tasks.put((self.task_send, (data, callback)))
+    def begin_send(self, data):
+        self.tasks.put((self.task_send, (data,)))
 
-    def task_receive(self, callback):
+    def task_receive(self):
         data = ''.encode()
         try:
             # Try to get data as long as the other side is sending
@@ -49,14 +49,16 @@ class client():
             # If there was anyting send, call the callback and stop trying to recieve
             if len(data) > 0:
                 try:
-                    callback(self, data)
+                    if self.server.on_receive:
+                        self.server.on_receive(self, data)
                 except Exception as e:
                     if self.server.debug:
                         print(repr(e))
+                        print(traceback.format_exc())
                 self.try_receive = False
             # If not, if there should recieve, start loop back
             elif self.try_receive:
-                self.tasks.put((self.task_receive, (callback,)))
+                self.tasks.put((self.task_receive, ()))
         except:
             # The conncetion was lost, remove the client from clients list
             self.close()
@@ -87,18 +89,20 @@ class client():
         except Exception as e:
             if self.server.debug:
                 print(e)
+        finally:
+            self.close()
 
     def close(self):
         self.socket.close()
         self.work = False
-        self.server.clients.remove(self)
+        print (self.server.on_disconnect)
+        if self.server.on_disconnect:
+            self.server.on_disconnect(self)
 
 
-class server(socket.socket):
-    def __init__(self, binding, on_accept = None):
+class base_server(socket.socket):
+    def __init__(self, binding):
         self.work = True
-        self.on_accept = on_accept
-        self.clients = []
         socket.socket.__init__(self, socket.AF_INET, socket.SOCK_STREAM)
         try:
             #Try to set up the server
@@ -111,13 +115,16 @@ class server(socket.socket):
         except Exception as e:
             # There was a problem with initializing the server
             print(e)
+            return
+        while self.work:
+            if self.on_loop:
+                self.on_loop()
 
 
     def acceptClient(self, socket,address):
         c = client(self, socket, address)
         if self.on_accept:
             self.on_accept(c)
-        self.clients.append(c)
 
     def threader(self):
         while self.work:
@@ -125,6 +132,4 @@ class server(socket.socket):
                 self.acceptClient(*self.accept())
             except:
                 pass
-        for client in self.clients:
-            client.close()
         self.close()

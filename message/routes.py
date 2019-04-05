@@ -5,6 +5,7 @@ routes = [
 
 
 handles = [
-   ('/get','update_client')
+   ('/get_update','update_client'),
+   ('/send','message')
 ]
 

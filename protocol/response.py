@@ -7,6 +7,7 @@ def unknown_request():
 
         }
     }
+ 
 
 def token(token):
     return {
@@ -17,6 +18,7 @@ def token(token):
             'TOKEN':token
         }
     }
+
 
 def login(id,token):
     return {
@@ -29,6 +31,7 @@ def login(id,token):
         }
     }
 
+
 def wrong_authentication():
     return {
         'headers':{
@@ -36,5 +39,16 @@ def wrong_authentication():
         },
         'body':{
 
+        }
+    }
+
+
+def update_chat(chat):
+    return {
+        'headers':{
+            'TYPE':0
+        },
+        'body':{
+            'chat':chat
         }
     }
